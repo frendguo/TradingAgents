@@ -1,0 +1,43 @@
+version: "1.0"
+
+project:
+  name: "trading-agents-webui"
+  description: "Multi-agent LLM trading framework with web interface"
+
+services:
+  - name: "trading-agents"
+    type: "compose"
+    compose:
+      file: "docker-compose.yml"
+    environment:
+      FINNHUB_API_KEY: "${FINNHUB_API_KEY}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+      GOOGLE_API_KEY: "${GOOGLE_API_KEY}"
+      DEEPSEEK_API_KEY: "${DEEPSEEK_API_KEY}"
+    domains:
+      - domain: "your-domain.com"
+        port: 80
+        ssl: true
+    volumes:
+      - source: "./data"
+        target: "/app/data"
+        type: "bind"
+      - source: "./results"
+        target: "/app/results"
+        type: "bind"
+    
+deployment:
+  strategy: "rolling"
+  replicas: 1
+  resources:
+    memory: "4Gi"
+    cpu: "2"
+
+monitoring:
+  enabled: true
+  health_check:
+    path: "/health"
+    interval: 30
+    timeout: 10
+    retries: 3
